@@ -23,7 +23,7 @@ class MyServer(BaseHTTPRequestHandler):
 		self.send_header("Content-type", "text/html")
 		self.end_headers()
 		with open('index.html', 'r') as webpage_file:
-			self.wfile.write(bytes(eval('f' +repr(webpage_file.read())), "utf-8"))
+			self.wfile.write(bytes(webpage_file.read(), "utf-8"))
 		self.wfile.write(bytes(get_current_pressure_reading(), 'utf-8'))
 
 if __name__ == "__main__":
