@@ -2,6 +2,8 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import time
 from datetime import datetime
+import json
+import random
 import RPi.GPIO as GPIO
 
 hostName = "localhost"
@@ -11,29 +13,52 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(4,GPIO.IN)
 
 def get_current_time_string():
-	now = datetime.now().time()
-	return f"The current time is: {now}"
+        now = datetime.now().time()
+        return f"The current time is: {now}"
 
-def get_current_pressure_reading():
-	return f"Someone is currently sitting at the desk = {GPIO.input(4)}"
+def seat_currently_occupied():
+        return GPIO.input(4) == 1
+        # return random.randint(0,1) == 0
 
 class MyServer(BaseHTTPRequestHandler):
-	def do_GET(self):
-		self.send_response(200)
-		self.send_header("Content-type", "text/html")
-		self.end_headers()
-		with open('index.html', 'r') as webpage_file:
-			self.wfile.write(bytes(webpage_file.read(), "utf-8"))
-		self.wfile.write(bytes(get_current_pressure_reading(), 'utf-8'))
+        def do_GET(self):
+                if self.path == '/':
+                        print("Returning index.html")
+
+                        self.send_response(200)
+                        self.send_header("Content-type", "text/html")
+                        self.end_headers()
+                        with open('index.html', 'r') as webpage_file:
+                                self.wfile.write(bytes(webpage_file.read(), "utf-8"))
+                                # self.wfile.write(bytes(get_current_pressure_reading(), 'utf-8'))
+
+                elif self.path == '/get_current_occupancy':
+                        print("Returning current occupancy readings")
+
+                        self.send_response(200)
+                        self.send_header("Content-type", "application/json")
+                        self.end_headers()
+
+                        current_value = {
+                                "seatName": "Seat #1",
+                                "current_occupied": seat_currently_occupied()
+                        }
+
+                        print(f"Returning current readings: {json.dumps(current_value)}")
+                        self.wfile.write(bytes(f'[ {json.dumps(current_value)} ]', 'utf-8'))
+                else:
+                        print(f"Invalid path: {self.path}")
+                        self.send_response(400)
+
 
 if __name__ == "__main__":
-	webServer = HTTPServer((hostName, serverPort), MyServer)
-	print("Server started http://%s:%s" % (hostName, serverPort))
+        webServer = HTTPServer((hostName, serverPort), MyServer)
+        print("Server started http://%s:%s" % (hostName, serverPort))
 
-	try:
-		webServer.serve_forever()
-	except KeyboardInterrupt:
-		pass
-	webServer.server_close()
-	GPIO.cleanup()
-	print("Server stopped.")
+        try:
+                webServer.serve_forever()
+        except KeyboardInterrupt:
+                pass
+        webServer.server_close()
+        GPIO.cleanup()
+        print("Server stopped.")

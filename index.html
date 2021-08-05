@@ -1,17 +1,44 @@
 <html>
-<head>
+    <head>
 	<title>Seat Occupancy Tracker</title>
+    </head>
+    <body>
 	<script>
-	const userAction = async () => {"
-		const response = await fetch('http://example.com/movies.json');
-		const myJson = await response.json();
-		console.Log('test')
-	}
+	 async function get_current_occupancy() {
+	     console.log("fetching current occupancy from Raspberry Pi")
+	     let response = await fetch('http://localhost:9009/get_current_occupancy');
+	     let data = await response.json();
+	     console.log(data);
+
+	     for (const desk of data) {
+		 console.log(desk)
+		 var desk_node = document.getElementById(desk.seatName);
+		 if (desk_node == null) {
+		     desk_node = document.createElement("LI");
+		     desk_node.setAttribute("id", desk.seatName);
+
+		     document.getElementById("my_desks").appendChild(desk_node);
+		 }
+		 console.log(desk.current_occupied)
+		 if (desk.current_occupied) {
+		     desk_node.textContent = "" + desk.seatName + ": Currently Occupied";
+		     desk_node.setAttribute("style", "color:red");
+		 }
+		 else {
+		     desk_node.textContent = "" + desk.seatName + ": Currently Empty";
+		     desk_node.setAttribute("style", "color:green");
+		 }
+	     }
+	     setTimeout(get_current_occupancy, 3000)
+	 }
+	 console.log("Starting request loop")
+	 get_current_occupancy()
 	</script>
-</head>
-<body>
-	<p>Request: %s</p>" % self.path, "utf-8"))
-	<p>This is an example web server.</p>
-	<b>{get_current_time_string()}</b>
-</body>
+<!-- <p>Request: %s</p>" % self.path, "utf-8")) -->
+	<p>List of all actively monitored desks:</p>
+	<!-- <b>{get_current_time_string()}</b> -->
+	<ul id="my_desks">
+	</ul>
+
+    </body>
 </html>
