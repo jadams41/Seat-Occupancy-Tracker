@@ -17,7 +17,7 @@ def get_current_time_string():
         return f"The current time is: {now}"
 
 def seat_currently_occupied():
-        return GPIO.input(4) == 1
+        return GPIO.input(4) == 0
         # return random.randint(0,1) == 0
 
 class MyServer(BaseHTTPRequestHandler):
@@ -39,13 +39,25 @@ class MyServer(BaseHTTPRequestHandler):
                         self.send_header("Content-type", "application/json")
                         self.end_headers()
 
-                        current_value = {
-                                "seatName": "Seat #1",
-                                "current_occupied": seat_currently_occupied()
-                        }
-
+                        current_value = [
+                                {
+                                        "seatName": "Seat #1",
+                                        "current_occupied": seat_currently_occupied()
+                                },
+                                {
+                                        "seatName": "Seat #2",
+                                        # "current_occupied": True
+                                },
+                                {
+                                        "seatName": "Seat #3",
+                                        # "current_occupied": True
+                                },
+                                {
+                                        "seatName": "Seat #4", # "current_occupied": True
+                                }
+                        ]
                         print(f"Returning current readings: {json.dumps(current_value)}")
-                        self.wfile.write(bytes(f'[ {json.dumps(current_value)} ]', 'utf-8'))
+                        self.wfile.write(bytes(f'{json.dumps(current_value)}', 'utf-8'))
                 else:
                         print(f"Invalid path: {self.path}")
                         self.send_response(400)
