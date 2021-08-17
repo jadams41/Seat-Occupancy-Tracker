@@ -4,22 +4,23 @@ import time
 from datetime import datetime
 import json
 import random
-import RPi.GPIO as GPIO
+# import RPi.GPIO as GPIO
+from gpiozero import InputDevice
+
 
 hostName = "localhost"
 serverPort = 9009
-
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(26,GPIO.IN)
+input_device=InputDevice(17)
 
 def get_current_time_string():
         now = datetime.now().time()
         return f"The current time is: {now}"
 
 def seat_currently_occupied():
-        current_value = GPIO.input(26)
-        print(f"XXXX Current value is {current_value} XXXX")
-        return current_value == 0
+        # current_value = GPIO.input(26)
+        current_value=input_device.value
+        print(f'pin 17 reads: {current_value}')
+        return current_value == 1
         # return random.randint(0,1) == 0
 
 class MyServer(BaseHTTPRequestHandler):
@@ -84,5 +85,4 @@ if __name__ == "__main__":
         except KeyboardInterrupt:
                 pass
         webServer.server_close()
-        GPIO.cleanup()
         print("Server stopped.")
