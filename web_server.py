@@ -61,6 +61,16 @@ class MyServer(BaseHTTPRequestHandler):
                 else:
                         print(f"Invalid path: {self.path}")
                         self.send_response(400)
+        def do_POST(self):
+                print("Someone posted to me!")
+                if self.path == '/upload_sensor_data':
+                        print("Received post")
+                        print(self.data)
+
+                print(self)
+                self.send_response(200)
+                self.send_header("Content-type", "application/json")
+                self.end_headers()
 
 
 if __name__ == "__main__":
