@@ -10,14 +10,16 @@ hostName = "localhost"
 serverPort = 9009
 
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(4,GPIO.IN)
+GPIO.setup(26,GPIO.IN)
 
 def get_current_time_string():
         now = datetime.now().time()
         return f"The current time is: {now}"
 
 def seat_currently_occupied():
-        return GPIO.input(4) == 0
+        current_value = GPIO.input(26)
+        print(f"XXXX Current value is {current_value} XXXX")
+        return current_value == 0
         # return random.randint(0,1) == 0
 
 class MyServer(BaseHTTPRequestHandler):
