@@ -24,7 +24,7 @@ def seat_currently_occupied():
 mac = get_mac()
 mac_str = ':'.join(("%012X" % mac)[i:i+2] for i in range(0, 12, 2))
 print(f"mac address is {mac_str}")
-myobj['client_id'] = mac_str
+myobj['client_id'] = f'Sensor: {mac_str}'
 
 while True:
     myobj['seat_occupied'] = seat_currently_occupied()
