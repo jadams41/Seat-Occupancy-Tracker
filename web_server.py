@@ -7,7 +7,7 @@ from datetime import datetime
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 hostName = "localhost"
-serverPort = 9009
+serverPort = 80
 
 current_seats = {
         'Dummy Seat #1': "Dummy value",
@@ -16,10 +16,12 @@ current_seats = {
 
 def process_received_data(data):
         print(f"Recieved data!: {data}")
-        if not data['client_id'] or not data['seat_occupied']:
-                print("Data was invalid... ignoring")
-
-        current_seats[data['client_id']] = data['seat_occupied']
+        if False and not hasattr(data, 'client_id'):
+            print("Data was missing client id, ignoring")
+        elif not hasattr(data, 'seat_occupied'):
+            print("Data was missing seat occupied... ignoring")
+        else:
+            current_seats[data['client_id']] = data['seat_occupied']
 
 class MyServer(BaseHTTPRequestHandler):
         def do_GET(self):
@@ -67,7 +69,7 @@ class MyServer(BaseHTTPRequestHandler):
                 self.end_headers()
 
 if __name__ == "__main__":
-        webServer = HTTPServer((hostName, serverPort), MyServer)
+        webServer = HTTPServer(('', serverPort), MyServer)
 
         hostname = socket.gethostname()
         local_ip = socket.gethostbyname(hostname)

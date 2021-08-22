@@ -2,20 +2,29 @@ import requests
 import random 
 from time import sleep
 from uuid import getnode as get_mac
-from gpiozero import InputDevice
 
-input_device=InputDevice(17)
+try:
+    from gpiozero import InputDevice
+    input_device=InputDevice(17)
+    running_in_mock_mode = False
+except:
+    running_in_mock_mode = True
+    pass
 
 url = 'http://54.227.187.8/upload_sensor_data'
-myobj = {'client_id': random.randint(0,10000)}
+myobj = {'client_id': ''}
 
 def seat_currently_occupied():
-    input_value=input_device.value
+    if not running_in_mock_mode:
+        input_value=input_device.value
+    else:
+        input_value=random.randint(0,1)
     return input_value == 1
 
 mac = get_mac()
-print(f"mac address is {mac}")
-myobj['client_id'] = mac
+mac_str = ':'.join(("%012X" % mac)[i:i+2] for i in range(0, 12, 2))
+print(f"mac address is {mac_str}")
+myobj['client_id'] = mac_str
 
 while True:
     myobj['seat_occupied'] = seat_currently_occupied()
